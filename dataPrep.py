@@ -41,3 +41,6 @@ class CustomMusicDataset(Dataset):
     def __getitem__(self, index):
         return self.features[index], self.labels[index]
 
+#using primitive dataloader to create iterable of batches
+dataset = CustomMusicDataset(X, y)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)

@@ -39,7 +39,7 @@ def playlists():
     sp = spotipy.Spotify(auth=token_info['access_token'])
 
     # Get the user's playlists
-    results = sp.current_user_playlists(limit=50)
+    results = sp.current_user_playlists(limit=1)
     playlists = results['items']
 
     # Collect track features and labels
@@ -53,11 +53,11 @@ def playlists():
         track_ids = [track['track']['id'] for track in tracks['items'] if track['track']]
         features = get_tracks_features(sp, track_ids)
         features_list.extend(features)
-        labels_list.extend([playlist_name] * len(features))
+        labels_list.extend([playlist_name])  # Append playlist name once for all tracks in the playlist
 
     # Filter out None values
     features_list = [f for f in features_list if f]
-    labels_list = [labels_list[i] for i in range(len(labels_list)) if features_list[i]]
+    labels_list = labels_list[:len(features_list)]  # Ensure labels list has same length as features list
 
     # Save features and labels to JSON files
     with open('features.json', 'w') as f:
@@ -66,6 +66,7 @@ def playlists():
         json.dump(labels_list, f)
 
     return 'Data collection complete!'
+
 
 def get_track_features(sp, track_id):
     features = sp.audio_features(track_id)

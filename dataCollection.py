@@ -17,8 +17,6 @@ scope = 'playlist-read-private'
 
 sp_oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope)
 
-
-#flask route functions to login and get playlist data
 @app.route('/')
 def login():
     auth_url = sp_oauth.get_authorize_url()
@@ -40,16 +38,12 @@ def playlists():
 
     sp = spotipy.Spotify(auth=token_info['access_token'])
 
-    #get the user's playlists, with limit for current testing
-    results = sp.current_user_playlists(limit=3)
+    # Get the user's playlists
+    results = sp.current_user_playlists(limit=2)
     playlists = results['items']
 
-    #collect track features and labels
-
-    #features contains all spotify's classifications for songs
+    # Collect track features and labels
     features_list = []
-
-    #labels is title of playlists
     labels_list = []
 
     for playlist in playlists:
@@ -59,20 +53,19 @@ def playlists():
         track_ids = [track['track']['id'] for track in tracks['items'] if track['track']]
         features = get_tracks_features(sp, track_ids)
         features_list.extend(features)
-        labels_list.extend([playlist_name])  # Append playlist name once for all tracks in the playlist
+        labels_list.extend([playlist_name] * len(features))
 
     # Filter out None values
     features_list = [f for f in features_list if f]
-    labels_list = labels_list[:len(features_list)]  # Ensure labels list has same length as features list
+    labels_list = [labels_list[i] for i in range(len(labels_list)) if features_list[i]]
 
-    #save and write features and labels to JSON files
+    # Save features and labels to JSON files
     with open('features.json', 'w') as f:
         json.dump(features_list, f)
     with open('labels.json', 'w') as f:
         json.dump(labels_list, f)
 
     return 'Data collection complete!'
-
 
 def get_track_features(sp, track_id):
     features = sp.audio_features(track_id)

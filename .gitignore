@@ -1,7 +1,7 @@
 
 #ignore env
-
 .env
 spotify_credentials.env
 
+#ignore spotify data
 backend/data

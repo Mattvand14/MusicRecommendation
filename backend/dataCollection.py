@@ -39,7 +39,7 @@ def playlists():
     sp = spotipy.Spotify(auth=token_info['access_token'])
 
     # Get the user's playlists
-    results = sp.current_user_playlists(limit=2)
+    results = sp.current_user_playlists(limit=50)
     playlists = results['items']
 
     # Collect track features and labels
